@@ -22,8 +22,8 @@ class UserService
     {
         $data['password'] = Hash::make($data['password']);
         // Validasi gambar jika ada
-        if (isset($data['picture'])) {
-            $data['picture'] = $this->handleProfilePicture($data['picture']);
+        if (isset($data['avatar'])) {
+            $data['avatar'] = $this->handleProfilePicture($data['avatar']);
         }
 
         return $this->userRepository->store($data);

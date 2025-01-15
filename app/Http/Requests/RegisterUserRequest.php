@@ -26,7 +26,7 @@ class RegisterUserRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'picture' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validasi file gambar
+            'avatar' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validasi file gambar
             'password' => 'required|string|min:8|confirmed',
         ];
     }
