@@ -8,6 +8,7 @@ use App\Http\Requests\RegisterUserRequest;
 use App\Http\Resources\UserResource;
 use App\Services\UserService;
 use App\Traits\ApiResponse;
+use Illuminate\Http\JsonResponse;
 
 class AuthController extends Controller
 {
@@ -18,18 +19,56 @@ class AuthController extends Controller
         $this->userService = $userService;
     }
 
-    public function register(RegisterUserRequest $request)
+    /**
+     * Register a new user.
+     */
+    public function register(RegisterUserRequest $request): JsonResponse
     {
-        $user = $this->userService->register($request->validated());
-        return ApiResponse::successResponse(new UserResource($user), 'User registered successfully.');
+        try {
+            $user = $this->userService->register($request->validated());
+            return ApiResponse::successResponse(
+                new UserResource($user),
+                'User registered successfully.',
+                201
+            );
+        } catch (\Exception $e) {
+            return ApiResponse::errorResponse(
+                'Registration failed.',
+                500,
+                ['error' => $e->getMessage()]
+            );
+        }
     }
 
-    public function login(LoginUserRequest $request)
+    /**
+     * Log in a user.
+     */
+    public function login(LoginUserRequest $request): JsonResponse
     {
-        $data = $this->userService->login($request->validated());
-        return ApiResponse::successResponse([
-            'user' => new UserResource($data['user']),
-            'token' => $data['token']
-        ], 'Login successful.');
+        try {
+            $data = $this->userService->login($request->validated());
+
+            // Check if login returned null or empty data
+            if (!$data || empty($data['user']) || empty($data['token'])) {
+                return ApiResponse::errorResponse(
+                    'Invalid login credentials.',
+                    401
+                );
+            }
+
+            return ApiResponse::successResponse(
+                [
+                    'user' => new UserResource($data['user']),
+                    'token' => $data['token']
+                ],
+                'Login successful.'
+            );
+        } catch (\Exception $e) {
+            return ApiResponse::errorResponse(
+                'Login failed.',
+                500,
+                ['error' => $e->getMessage()]
+            );
+        }
     }
 }

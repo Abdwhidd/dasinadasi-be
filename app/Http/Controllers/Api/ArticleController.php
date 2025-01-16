@@ -9,6 +9,7 @@ use App\Services\ArticleService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Exception;
 
 class ArticleController extends Controller
 {
@@ -26,11 +27,15 @@ class ArticleController extends Controller
      */
     public function index(Request $request)
     {
-        $articles = $this->articleService->getAllArticles($request->all());
-        return self::successResponse(
-            ArticleResource::collection($articles),
-            'Articles retrieved successfully.'
-        );
+        try {
+            $articles = $this->articleService->getAllArticles($request->all());
+            return self::successResponse(
+                ArticleResource::collection($articles),
+                'Articles retrieved successfully.'
+            );
+        } catch (Exception $e) {
+            return self::errorResponse('Failed to retrieve articles.', 500, ['error' => $e->getMessage()]);
+        }
     }
 
     /**
@@ -38,21 +43,24 @@ class ArticleController extends Controller
      */
     public function store(ArticleRequest $request)
     {
-        $data = $request->validated();
-        $data['user_id'] = Auth::id(); // Set author as the current user
+        try {
+            $data = $request->validated();
+            $data['user_id'] = Auth::id();
 
-        // Generate slug from the title if it's not provided
-        if (empty($data['slug'])) {
-            $data['slug'] = \Str::slug($data['title']);
+            if (empty($data['slug'])) {
+                $data['slug'] = \Str::slug($data['title']);
+            }
+
+            $article = $this->articleService->createArticle($data);
+
+            return self::successResponse(
+                new ArticleResource($article),
+                'Article created successfully.',
+                201
+            );
+        } catch (Exception $e) {
+            return self::errorResponse('Failed to create article.', 500, ['error' => $e->getMessage()]);
         }
-
-        $article = $this->articleService->createArticle($data);
-
-        return self::successResponse(
-            new ArticleResource($article),
-            'Article created successfully.',
-            201
-        );
     }
 
     /**
@@ -60,16 +68,20 @@ class ArticleController extends Controller
      */
     public function show($id)
     {
-        $article = $this->articleService->getArticleById($id);
+        try {
+            $article = $this->articleService->getArticleById($id);
 
-        if (!$article) {
-            return self::errorResponse('Article not found.', 404);
+            if (!$article) {
+                return self::errorResponse('Article not found.', 404);
+            }
+
+            return self::successResponse(
+                new ArticleResource($article),
+                'Article retrieved successfully.'
+            );
+        } catch (Exception $e) {
+            return self::errorResponse('Failed to retrieve article.', 500, ['error' => $e->getMessage()]);
         }
-
-        return self::successResponse(
-            new ArticleResource($article),
-            'Article retrieved successfully.'
-        );
     }
 
     /**
@@ -77,27 +89,30 @@ class ArticleController extends Controller
      */
     public function update(ArticleRequest $request, $id)
     {
-        $article = $this->articleService->getArticleById($id);
+        try {
+            $article = $this->articleService->getArticleById($id);
 
-        if (!$article) {
-            return self::errorResponse('Article not found.', 404);
+            if (!$article) {
+                return self::errorResponse('Article not found.', 404);
+            }
+
+            if ($article->user_id !== Auth::id()) {
+                return self::errorResponse('Unauthorized to update this article.', 403);
+            }
+
+            if (empty($request->slug)) {
+                $request->merge(['slug' => \Str::slug($request->title)]);
+            }
+
+            $updatedArticle = $this->articleService->updateArticle($id, $request->validated());
+
+            return self::successResponse(
+                new ArticleResource($updatedArticle),
+                'Article updated successfully.'
+            );
+        } catch (Exception $e) {
+            return self::errorResponse('Failed to update article.', 500, ['error' => $e->getMessage()]);
         }
-
-        if ($article->user_id !== Auth::id()) {
-            return self::errorResponse('Unauthorized to update this article.', 403);
-        }
-
-        // Generate slug from the title if it's not provided
-        if (empty($request->slug)) {
-            $request->merge(['slug' => \Str::slug($request->title)]);
-        }
-
-        $updatedArticle = $this->articleService->updateArticle($id, $request->validated());
-
-        return self::successResponse(
-            new ArticleResource($updatedArticle),
-            'Article updated successfully.'
-        );
     }
 
     /**
@@ -105,21 +120,25 @@ class ArticleController extends Controller
      */
     public function destroy($id)
     {
-        $article = $this->articleService->getArticleById($id);
+        try {
+            $article = $this->articleService->getArticleById($id);
 
-        if (!$article) {
-            return self::errorResponse('Article not found.', 404);
+            if (!$article) {
+                return self::errorResponse('Article not found.', 404);
+            }
+
+            if ($article->user_id !== Auth::id()) {
+                return self::errorResponse('Unauthorized to delete this article.', 403);
+            }
+
+            $this->articleService->deleteArticle($id);
+
+            return self::successResponse(
+                null,
+                'Article deleted successfully.'
+            );
+        } catch (Exception $e) {
+            return self::errorResponse('Failed to delete article.', 500, ['error' => $e->getMessage()]);
         }
-
-        if ($article->user_id !== Auth::id()) {
-            return self::errorResponse('Unauthorized to delete this article.', 403);
-        }
-
-        $this->articleService->deleteArticle($id);
-
-        return self::successResponse(
-            null,
-            'Article deleted successfully.'
-        );
     }
 }
