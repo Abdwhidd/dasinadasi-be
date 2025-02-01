@@ -15,7 +15,7 @@ class ArticleController extends Controller
 {
     use ApiResponse;
 
-    protected $articleService;
+    protected ArticleService $articleService;
 
     public function __construct(ArticleService $articleService)
     {

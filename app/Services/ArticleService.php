@@ -20,7 +20,7 @@ class ArticleService
      * @param array $filters
      * @return mixed
      */
-    public function getAllArticles(array $filters = [])
+    public function getAllArticles(array $filters = []): mixed
     {
         try {
             return $this->articleRepository->getAll($filters);
@@ -36,7 +36,7 @@ class ArticleService
      * @param int $id
      * @return mixed
      */
-    public function getArticleById(int $id)
+    public function getArticleById(int $id): mixed
     {
         try {
             return $this->articleRepository->findById($id);
@@ -52,7 +52,7 @@ class ArticleService
      * @param array $data
      * @return mixed
      */
-    public function createArticle(array $data)
+    public function createArticle(array $data): mixed
     {
         try {
             return $this->articleRepository->create($data);
@@ -68,8 +68,9 @@ class ArticleService
      * @param int $id
      * @param array $data
      * @return mixed
+     * @throws \Exception
      */
-    public function updateArticle(int $id, array $data)
+    public function updateArticle(int $id, array $data): mixed
     {
         try {
             return $this->articleRepository->update($id, $data);
