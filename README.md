@@ -1,4 +1,4 @@
-# Laravel Backend Application
+# Blog Dasinadasi Laravel Backend Application
 
 <p align="center">
     <a href="https://laravel.com" target="_blank">
@@ -21,41 +21,58 @@
     </a>
 </p>
 
-## Deskripsi
+## Introduction
 
-Laravel adalah framework PHP yang kuat dan elegan untuk membangun aplikasi web. Dengan sintaks yang ekspresif dan fitur-fitur built-in yang luar biasa, Laravel memungkinkan pengembang untuk menyelesaikan tugas-tugas pengembangan web sehari-hari dengan cepat dan efisien.
+This is the backend API documentation for the Personal Blogging Platform, built using Laravel. The API follows RESTful principles and provides endpoints for managing blog posts, categories, users, and authentication.
 
-Laravel mencakup fitur-fitur seperti:
-- Routing yang sederhana
-- Dependency Injection Container yang kuat
-- ORM Eloquent untuk interaksi database
-- Migrasi database yang mudah digunakan
-- Proses pekerjaan latar belakang yang handal
-- Penyiaran event secara real-time
-- Dan banyak lagi...
+## Features
+- User authentication (JWT-based)
+- CRUD operations for blog posts
+- Category management
+- Commenting system
+- Role-based access control
+- API rate limiting
 
-## Fitur Utama
-- **Routing**: Routing yang bersih dan ekspresif untuk membangun URL yang dapat dipahami.
-- **Dependency Injection**: Sistem kontainer dependency injection untuk pengelolaan dependensi yang lebih mudah.
-- **ORM Eloquent**: Manajemen database berbasis objek yang memudahkan pengelolaan data.
-- **Migrasi Database**: Pembaruan skema database tanpa masalah menggunakan sistem migrasi.
-- **Pekerjaan Latar Belakang**: Pengelolaan pekerjaan latar belakang menggunakan queue.
-- **Autentikasi & Otorisasi**: Sistem yang mudah dikonfigurasi untuk login, pendaftaran, dan otorisasi.
+## Installation
 
-## Instalasi
-
-Ikuti langkah-langkah berikut untuk menginstal dan menjalankan aplikasi Laravel ini secara lokal:
-
-### Persyaratan Sistem
-Pastikan Anda memiliki hal-hal berikut sebelum melanjutkan:
-- PHP >= 7.3
+Ensure you have the following installed:
+- PHP >= 8.1
 - Composer
-- Database (MySQL, PostgreSQL, SQLite, atau lainnya)
+- MySQL or PostgreSQL
+- Laravel 11
 
-### Langkah 1: Klon Repositori
+## Setup
 
-Clone repositori ini ke komputer lokal Anda:
-
+### 1.Clone the repository:
 ```bash
-git clone https://github.com/username/laravel-project.git
-cd laravel-project
+git clone https://github.com/Abdwhidd/dasinadasi-be.git
+cd dasinadasi-be
+```
+### 2.Install dependencies:
+```bash
+composer install
+```
+### 3.Create the .env file:
+```bash
+cp .env.example .env
+```
+### 4.Set up the database:
+- Configure .env with your database details
+- Run migrations:
+```bash
+php artisan migrate
+```
+### 5.Generate application key:
+```bash
+php artisan key:generate
+```
+### 6.Run the server:
+```bash
+php artisan serve
+```
+
+## Testing
+Run automated tests using PHPUnit:
+```bash
+php artisan test
+```
